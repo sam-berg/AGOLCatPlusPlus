@@ -1,0 +1,7 @@
+﻿<dm:BookmarksConfigCollection xmlns="http://schemas.microsoft.com/client/2007" xmlns:dm="clr-namespace:AGOLCatPlusPlus">
+
+    <dm:BookmarksConfig IsEditState="False" Name="Starting Extent.  This should go to two lines." Description="One" SubDescription="OneB" ThumbnailImageSourceURL="http://www.esri.com/software/arcgis/graphics/news/use-case-3.jpg" />
+  <dm:BookmarksConfig IsEditState="False" Name="Second Bookmark" Description="One" SubDescription="OneB" ThumbnailImageSourceURL="http://www.esri.com/software/arcgis/graphics/news/use-case-3.jpg" />
+  <dm:BookmarksConfig IsEditState="False" Name="Third Bookmark" Description="One" SubDescription="OneB" ThumbnailImageSourceURL="http://www.esri.com/software/arcgis/graphics/news/use-case-3.jpg" />
+
+</dm:BookmarksConfigCollection>

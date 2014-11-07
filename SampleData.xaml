@@ -1,0 +1,10 @@
+﻿<locals:PortalResultCollection xmlns:locals="clr-namespace:AGOLCatPlusPlus" >
+  <locals:MyArcGISPortalItem 
+    Id="88cc5fe88d624252bbfec477e35840c5"
+  Title="NH Historical Marker Shortlist Map (demo)"
+    Type="Web Map"
+    Snippet="Tile Service of Wetland covertypes for the Black, Mohawk, Oswegatchie, Raquette, and St. Regis Rivers in the Adirondack Park."
+    ThumbnailUri="https://esrinortheast.maps.arcgis.com/sharing/rest/content/items/88cc5fe88d624252bbfec477e35840c5/info/thumbnail/ago_downloaded.png"
+    Url="https://esrinortheast.maps.arcgis.com/sharing/rest/content/items/88cc5fe88d624252bbfec477e35840c5/info/thumbnail/ago_downloaded.png"
+  />
+</locals:PortalResultCollection>

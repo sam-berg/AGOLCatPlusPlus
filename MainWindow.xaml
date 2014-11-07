@@ -2,11 +2,18 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:locals="clr-namespace:AGOLCatPlusPlus"
+        xmlns:interactivity="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:action="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
-   
+   DataContext="{Binding Source={StaticResource MapVM}}"
+  
+ mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        
 		Title="AGOLCat++" 
 		Height="350" 
 		Width="525" AllowDrop="True" WindowState="Maximized">
+
+  
   <Grid>
     <Grid.Resources>
       <locals:ImageBrushConverter x:Key="imgBrushBookmark"/>
@@ -154,16 +161,18 @@
 
     </Grid.Resources>
 
-    <esri:MapView x:Name="MyMapView"
+
+    <esri:MapView x:Name="MyMapView" Map="{Binding MainMap}"
 					  LayerLoaded="MyMapView_LayerLoaded" DragOver="MyMapView_DragOver" Drop="MyMapView_Drop">
-      <esri:Map>
+      <!--<esri:Map>
         <esri:ArcGISTiledMapServiceLayer ID="Basemap"
 					ServiceUri="http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"/>
-      </esri:Map>
+      </esri:Map>-->
     </esri:MapView>
 
+    <locals:BookmarksPanel HorizontalAlignment="Right" Margin="0,100,20,0" ></locals:BookmarksPanel>
 
-    <Grid x:Name="grdCatalog" Margin="20" Opacity=".7" Background="AliceBlue" Drop="Grid_Drop">
+    <Grid x:Name="grdCatalog"  Margin="20" Opacity=".7" Background="AliceBlue" Drop="Grid_Drop">
 
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
@@ -176,6 +185,10 @@
                  BorderThickness="1"     
                  ItemContainerStyle="{StaticResource lstStyle}"
                  ItemTemplate="{StaticResource listItemTemplate}"  Background="Transparent" ItemsSource="{Binding}"                                  
+               
+               
+               d:DataContext="{d:DesignData Source=SampleData.xaml}"
+               
                  >
 
 

@@ -1,8 +1,17 @@
 ﻿<Application x:Class="AGOLCatPlusPlus.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
+             xmlns:local="clr-namespace:AGOLCatPlusPlus"
              StartupUri="MainWindow.xaml"
 			 Startup="Application_Startup">
-	<Application.Resources>
-	</Application.Resources>
+  <Application.Resources>
+
+    <local:MapViewModel x:Key="MapVM"/>
+
+    <esri:Map x:Key="MainMap">
+      <esri:ArcGISTiledMapServiceLayer  ID="Basemap"
+					ServiceUri="http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"/>
+    </esri:Map>
+  </Application.Resources>
 </Application>

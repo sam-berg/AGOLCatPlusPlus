@@ -1,0 +1,4 @@
+﻿<local:BookmarksConfig xmlns="http://schemas.microsoft.com/client/2007" xmlns:local="clr-namespace:AGOLCatPlusPlus"   
+             Name="Starting Extent" Description="One" SubDescription="OneB" 
+             ThumbnailImageSourceURL="http://school.discoveryeducation.com/clipart/images/bookmark.gif" 
+                       />

@@ -18,6 +18,11 @@ using Esri.ArcGISRuntime.WebMap;
 using System.Collections;
 using Esri.ArcGISRuntime.Security;
 using Esri.ArcGISRuntime.Http;
+using System.Windows.Data;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Dynamic;
+using Esri.ArcGISRuntime.Geometry;
 
 namespace AGOLCatPlusPlus
 {
@@ -37,12 +42,16 @@ namespace AGOLCatPlusPlus
     public MainWindow()
     {
       InitializeComponent();
+
+      //this.DataContext = new MapViewModel();
+
       this.userName = Properties.Settings.Default.username;
       this.password = Properties.Settings.Default.password;
       this.portalURL = Properties.Settings.Default.portal;
 
       IdentityManager.Current.ChallengeHandler = new MyChallengeHandler();
-
+      (this.DataContext as MapViewModel).MainMapView = this.MyMapView;//SBTEST
+        
 
       //doSearch();
 //      doLoadFromFile(null);
@@ -54,6 +63,8 @@ namespace AGOLCatPlusPlus
 
       await login();
       doLoadFromFile(null);
+
+      
     }
 
     private async Task  login()
@@ -90,7 +101,8 @@ MessageBox.Show(msg);
         if (sFileInput != null) { sFile = sFileInput; }
         DataTable dt = CsvFileToDatatable(sFile, true);
 
-        System.Collections.ArrayList pCachedData = new System.Collections.ArrayList();
+        //System.Collections.ArrayList pCachedData = new System.Collections.ArrayList();
+        PortalResultCollection pCachedData = new PortalResultCollection();
 
         foreach (DataRow r in dt.Rows)
         {
@@ -268,7 +280,24 @@ MessageBox.Show(msg);
         ArcGISPortalItem pItem = itemSearch.Results.First();// results[0];
         var webMap = await WebMap.FromPortalItemAsync(pItem);
         var webMapVM = await WebMapViewModel.LoadAsync(webMap, this.arcGISOnline);
-        this.MyMapView.Map = webMapVM.Map;
+        (this.DataContext as MapViewModel).MainMap = webMapVM.Map;
+        foreach(Bookmark p in webMap.Bookmarks)
+        {
+          dynamic pp = new ExpandoObject();
+          pp.Name=p.Name;
+          SpatialReference sr=new SpatialReference(4236);
+          if(p.Extent.SpatialReference!=null)sr=p.Extent.SpatialReference;
+
+          Envelope ppp = new Envelope(p.Extent.XMin, p.Extent.YMin, p.Extent.XMax, p.Extent.YMax, sr);
+
+          pp.extent = ppp;
+          (this.DataContext as MapViewModel).WebMapBookmarks.Add(pp);
+        }
+        
+
+        //add web bookmarks
+
+        //this.MyMapView.Map = webMapVM.Map;
 
         hideBrowser();
         
@@ -416,6 +445,7 @@ select System.IO.Path.GetDirectoryName(assembly.CodeBase.Replace("file:///", "")
       if (sQuery != null) p.StartInfo.Arguments += " -q " + sQuery;
 
       p.Start();
+
       p.WaitForExit();
 
       if (File.Exists(sFile))
@@ -425,6 +455,11 @@ select System.IO.Path.GetDirectoryName(assembly.CodeBase.Replace("file:///", "")
 
 
 
+  }
+
+  public class PortalResultCollection : System.Collections.Generic.List <MyArcGISPortalItem>
+  {
+    public PortalResultCollection() { }
   }
 
   public class MyChallengeHandler:Esri.ArcGISRuntime.Security.IChallengeHandler
@@ -579,6 +614,189 @@ select System.IO.Path.GetDirectoryName(assembly.CodeBase.Replace("file:///", "")
     public string TypeName { get; set; }
     public string Url { get; set; }
 
+  }
+
+  public class ImageBrushConverter2 : System.Windows.Data.IValueConverter
+  {
+    public ImageBrushConverter2() { }
+
+
+    #region IValueConverter Members
+
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+
+      //sbtest if (value == null || value == "") value = "Images/logo.png";
+      if (value == null || value == "") value = null;
+
+      BitmapImage _i = new BitmapImage();// (BitmapImage)value;
+
+      _i.BeginInit();
+
+
+      if (value != null)
+      {
+
+        //todo:
+        if (value.ToString().ToUpper().IndexOf("CONFIG/") < 0 && value.ToString().ToUpper().IndexOf("LAYERIMAGES/") < 0 && value.ToString().ToUpper().IndexOf("ASSETS/") < 0)
+        {
+          //          _i.UriSource = new Uri(value.ToString(), UriKind.Absolute);
+          _i.UriSource = new Uri(value.ToString(), UriKind.RelativeOrAbsolute);
+        }
+        else
+        {
+          _i.UriSource = new Uri(value.ToString(), UriKind.Relative);
+        }
+
+#if SILVERLIGHT
+
+#else
+        _i.EndInit();
+#endif
+
+        ImageBrush _b = new ImageBrush();
+        if (_i != null && value != null && value.ToString() != "")
+        {
+          _b.ImageSource = _i;
+          _b.Stretch = Stretch.Fill;
+        }
+        return _b;
+      }
+
+      return null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+      throw new NotImplementedException();
+    }
+
+    #endregion
+  }
+
+  public class ImageBrushConverterAbsolute : System.Windows.Data.IValueConverter
+  {
+
+    public ImageBrushConverterAbsolute() { }
+
+    #region IValueConverter Members
+
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+
+      BitmapImage _i = new BitmapImage();// (BitmapImage)value;
+
+      _i.BeginInit();
+
+
+      if (value != null)
+      {
+
+        //todo:
+        if (value.ToString().ToUpper().IndexOf(";COMPONENT/") > 0)
+        {
+          _i.UriSource = new Uri(value.ToString(), UriKind.RelativeOrAbsolute);
+        }
+        else if (value.ToString().ToUpper().IndexOf("CONFIG/") < 0 && value.ToString().ToUpper().IndexOf("LAYERIMAGES/") < 0 && value.ToString().ToUpper().IndexOf("ASSETS/") < 0)
+        {
+          _i.UriSource = new Uri(value.ToString(), UriKind.Absolute);
+        }
+        else
+        {
+          _i.UriSource = new Uri(value.ToString(), UriKind.Relative);
+        }
+
+
+        _i.EndInit();
+
+        ImageBrush _b = new ImageBrush();
+        if (_i != null && value != null && value.ToString() != "")
+        {
+          _b.ImageSource = _i;
+          _b.Stretch = Stretch.Fill;
+        }
+        return _b;
+      }
+
+      return null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+      throw new NotImplementedException();
+    }
+
+    #endregion
+  }
+
+  public class VisibilityConverter : IValueConverter
+  {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      bool visibility = (bool)value;
+      return visibility ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      Visibility visibility = (Visibility)value;
+      return (visibility == Visibility.Visible);
+    }
+  }
+
+
+  public class BookmarksConfig : INotifyPropertyChanged
+  {
+   // public Envelope Extent = new Envelope();
+    public string Description { get; set; }
+
+   // public ESRI.ArcGIS.Client.Toolkit.Bookmark.MapBookmark _MapBookmark { get; set; }
+
+    string layerTitle = "";
+    public string Name
+    {
+      get { return layerTitle; }
+      set
+      {
+        layerTitle = value;
+        //if (_MapBookmark != null) { _MapBookmark.Name = LayerTitle; }
+        NotifyPropertyChanged("Name");
+      }
+    }
+
+    public string ThumbnailImageSourceURL { get; set; }
+    public string SubDescription { get; set; }
+    public string Tag { get; set; }
+
+    bool isEditState = false;
+    public bool IsEditState
+    {
+      get { return isEditState; }
+      set { isEditState = value; NotifyPropertyChanged("IsEditState"); }
+    }
+
+    public bool NotIsEditState
+    {
+      get { return !isEditState; }
+      set { isEditState = !value; NotifyPropertyChanged("NotIsEditState"); }
+    }
+
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    public void NotifyPropertyChanged(string propertyName)
+    {
+      if (PropertyChanged != null)
+      {
+        PropertyChanged(this,
+            new PropertyChangedEventArgs(propertyName));
+      }
+    }
+
+  }
+
+  public class BookmarksConfigCollection : List<Object>
+  {
+    public BookmarksConfigCollection() { }
   }
 
 }
