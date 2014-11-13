@@ -433,21 +433,44 @@ select System.IO.Path.GetDirectoryName(assembly.CodeBase.Replace("file:///", "")
     private void cmdAGOLCat_Click(object sender, RoutedEventArgs e)
     {
 
+      // the python program as a string. Note '@' which allow us to have a multiline string
+//      String prg = @"import sys
+//x = int(sys.argv[1])
+//y = int(sys.argv[2])
+//print x+y";
+//      StreamWriter sw = new StreamWriter("d:\\atemp\\test2.py");
+//      sw.Write(prg); // write this program to a file
+//      sw.Close();
+
+
       string sFile = applicationDirectory + "\\searchResults.csv"; 
       sFile=sFile.Replace(@"\","/");
+      if (File.Exists(sFile)) File.Delete(sFile);
+
       string sQuery = null;
       if (txtQuery.Text != null && txtQuery.Text != "") sQuery = txtQuery.Text;
 
       System.Diagnostics.Process p = new Process();
-      p.StartInfo.FileName = "python.exe";
-      p.StartInfo.UseShellExecute = true;
-      p.StartInfo.Arguments = "D:/data/_code/_active/agoTools/samples/AGOLCat.py -file " + sFile + " -u " + this.userName + " -p " + this.password +" -portal " +this.portalURL;
+      p.StartInfo.FileName = "c:\\python27\\ArcGIS10.2\\python.exe";
+      p.StartInfo.CreateNoWindow = false;
+      p.StartInfo.UseShellExecute = false;
+      p.StartInfo.RedirectStandardOutput = true;
+
+      p.StartInfo.Arguments = "D:\\data\\_code\\_active\\agoTools\\samples\\AGOLCat.py -file " + sFile + " -u " + this.userName + " -p " + this.password +" -portal " +this.portalURL;
       if (sQuery != null) p.StartInfo.Arguments += " -q " + sQuery;
 
+      int a = 2;
+      int b = 2;
+      //p.StartInfo.Arguments = "d:\\atemp\\test2.py " + a + " " + b; // start the python program with two parameters
+            
       p.Start();
-
       p.WaitForExit();
+      StreamReader s = p.StandardOutput;
+      String output = s.ReadToEnd();
+      //string sLog = p.StandardOutput.ReadToEnd();
 
+      
+      
       if (File.Exists(sFile))
         doLoadFromFile(sFile);
 
