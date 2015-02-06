@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Dynamic;
 using Esri.ArcGISRuntime.Geometry;
+using Newtonsoft.Json;
 
 namespace AGOLCatPlusPlus
 {
@@ -62,6 +63,10 @@ namespace AGOLCatPlusPlus
     {
 
       await login();
+
+      //JSONTextToDataTableTest(null);
+      return;//SBTEST
+
       doLoadFromFile(null);
 
       
@@ -91,6 +96,76 @@ MessageBox.Show(msg);
 
 }
     }
+
+    private DataTable JSONTextToDataTableTest(string sInput)
+    {
+
+      lookBusy();
+      try
+      {
+        string sText = "";
+        if (sInput == null)
+        {
+          using (StreamReader sr = new StreamReader("d:\\atemp\\jsoninput2.txt"))
+          {
+            sText = sr.ReadToEnd();
+          }
+        }
+        else { sText = sInput; }
+
+        //DataTable dt = JsonConvert.DeserializeObject<DataTable>(sText);
+        dynamic input = JsonConvert.DeserializeObject(sText);
+        PortalResultCollection pCachedData = new PortalResultCollection();
+
+
+        if (input.items != null)
+          foreach (var item in input.items)
+          {
+            MyArcGISPortalItem a = jsonToPortalItem(item);
+            pCachedData.Add(a);
+          }
+        else if(input.results!=null)
+        {
+          foreach (var item in input.results)
+          {
+            MyArcGISPortalItem a = jsonToPortalItem(item);
+            pCachedData.Add(a);
+          }
+        }
+      
+
+
+
+        this.lstItems.DataContext = pCachedData;
+        dontLookBusy();
+        return null;
+      }
+      catch(Exception ex)
+      {
+        string s = ex.Message;
+      }
+      dontLookBusy();
+      return null;
+
+    }
+
+    private MyArcGISPortalItem jsonToPortalItem(dynamic item)
+    {
+      MyArcGISPortalItem p = new MyArcGISPortalItem();
+      
+
+      p.Description = item.description;
+      p.Id = item.id;
+      p.Name = item.name;
+      p.Snippet = item.snippet;
+      p.ThumbnailUri = "http://www.arcgis.com/sharing/rest/content/items/" + item.id + "/info/" + item.thumbnail;
+      p.Title = item.title;
+      p.Url = item.url;
+      p.Type = item.type;
+
+      return p;
+    }
+
     private  void doLoadFromFile(string sFileInput)
     {
 
@@ -232,6 +307,17 @@ MessageBox.Show(msg);
       return dataTable;
     }
 
+    private void lookBusy()
+    {
+      this.Cursor = Cursors.Wait;
+
+    }
+    private void dontLookBusy()
+    {
+
+      this.Cursor = Cursors.Arrow;
+    }
+
     private async Task doSearch()
     {
 
@@ -261,7 +347,8 @@ MessageBox.Show(msg);
     }
     private async Task loadWebMap(string sID)
     {
-
+      lookBusy();
+      hideBrowser();
       var portalUri = new Uri("https://www.arcgis.com/sharing/rest");
       // create the portal 
       if (this.arcGISOnline == null) { this.arcGISOnline = await ArcGISPortal.CreateAsync(portalUri); }; 
@@ -281,6 +368,8 @@ MessageBox.Show(msg);
         var webMap = await WebMap.FromPortalItemAsync(pItem);
         var webMapVM = await WebMapViewModel.LoadAsync(webMap, this.arcGISOnline);
         (this.DataContext as MapViewModel).MainMap = webMapVM.Map;
+
+        dontLookBusy();
         foreach(Bookmark p in webMap.Bookmarks)
         {
           dynamic pp = new ExpandoObject();
@@ -328,6 +417,7 @@ MessageBox.Show(msg);
       }
       else if (p.Type.ToString().ToUpper() == "WEB MAPPING APPLICATION")
       {
+
         string sUrl = p.Url;
         System.Diagnostics.Process.Start(sUrl);
       }
@@ -335,6 +425,11 @@ MessageBox.Show(msg);
       {
         //sDownload
        // HtmlPage.Window.Navigate(new Uri(sDownload), "_blank");
+        if (p.Url != null)
+        {
+          string sUrl = p.Url;
+          System.Diagnostics.Process.Start(sUrl);
+        }
       }
       else if (p.Type.ToString().ToUpper().IndexOf("MAP SERVICE") > -1)
       {
@@ -451,7 +546,7 @@ select System.IO.Path.GetDirectoryName(assembly.CodeBase.Replace("file:///", "")
       if (txtQuery.Text != null && txtQuery.Text != "") sQuery = txtQuery.Text;
 
       System.Diagnostics.Process p = new Process();
-      p.StartInfo.FileName = "c:\\python27\\ArcGIS10.2\\python.exe";
+      p.StartInfo.FileName = "c:\\python27\\ArcGIS10.3\\python.exe";
       p.StartInfo.CreateNoWindow = false;
       p.StartInfo.UseShellExecute = false;
       p.StartInfo.RedirectStandardOutput = true;
@@ -473,6 +568,21 @@ select System.IO.Path.GetDirectoryName(assembly.CodeBase.Replace("file:///", "")
       
       if (File.Exists(sFile))
         doLoadFromFile(sFile);
+
+    }
+
+    private void grdCatalog_KeyUp(object sender, KeyEventArgs e)
+    {
+      
+    }
+
+    private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+
+      var text = Clipboard.GetData(DataFormats.Text) as string;
+      JSONTextToDataTableTest(text);
+      grdCatalog.Visibility = Visibility.Visible;
+      e.Handled = true;
 
     }
 

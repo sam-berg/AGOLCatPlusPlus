@@ -34,14 +34,14 @@ namespace AGOLCatPlusPlus
       myBookmark.Name = "Test Me Too";
       myBookmark.IsEditState = false;
       myBookmark.extent = env;
-      this.webMapBookmarks.Add(myBookmark);
+      //this.webMapBookmarks.Add(myBookmark);
 
       dynamic myBookmark2 = new ExpandoObject();
       myBookmark2 = new ExpandoObject();
       myBookmark2.Name = "Test Me Three";
       myBookmark2.IsEditState = false;
       myBookmark2.extent = env;
-      this.webMapBookmarks.Add(myBookmark2);
+      //this.webMapBookmarks.Add(myBookmark2);
 
     }
 

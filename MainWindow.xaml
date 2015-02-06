@@ -13,8 +13,13 @@
 		Height="350" 
 		Width="525" AllowDrop="True" WindowState="Maximized">
 
-  
+  <Window.CommandBindings>
+    <CommandBinding Command="Paste" Executed="CommandBinding_Executed"/>
+  </Window.CommandBindings>
   <Grid>
+    <Grid.CommandBindings>
+      <CommandBinding Executed="CommandBinding_Executed" Command="Paste"/>
+    </Grid.CommandBindings>
     <Grid.Resources>
       <locals:ImageBrushConverter x:Key="imgBrushBookmark"/>
       <DropShadowEffect x:Key="dropShadow"/>
@@ -101,6 +106,11 @@
       <DataTemplate x:Key="listItemTemplate">
         <Border BorderBrush="Gray" BorderThickness=".5" Margin="5" CornerRadius="5">
           <Grid>
+            <Grid.CommandBindings>
+              <CommandBinding Command="Paste" Executed="CommandBinding_Executed">
+
+              </CommandBinding>
+            </Grid.CommandBindings>
             <Grid.RowDefinitions>
               <RowDefinition/>
               <RowDefinition/>
@@ -109,6 +119,11 @@
 
             <Grid Grid.Row="0"  Margin="5"  ScrollViewer.VerticalScrollBarVisibility="Auto" Height="190" Width="205" ToolTipService.ToolTip="{Binding Description}" >
 
+              <Grid.CommandBindings>
+                <CommandBinding Command="Paste" Executed="CommandBinding_Executed">
+
+                </CommandBinding>
+              </Grid.CommandBindings>
               <Grid.RowDefinitions>
                 <RowDefinition Height="140"/>
                 <RowDefinition Height="Auto"/>
@@ -164,6 +179,14 @@
 
     <esri:MapView x:Name="MyMapView" Map="{Binding MainMap}"
 					  LayerLoaded="MyMapView_LayerLoaded" DragOver="MyMapView_DragOver" Drop="MyMapView_Drop">
+      
+      <esri:MapView.CommandBindings>
+       
+          <CommandBinding Command="Paste" Executed="CommandBinding_Executed">
+
+          </CommandBinding>
+      
+      </esri:MapView.CommandBindings>
       <!--<esri:Map>
         <esri:ArcGISTiledMapServiceLayer ID="Basemap"
 					ServiceUri="http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"/>
@@ -172,8 +195,13 @@
 
     <locals:BookmarksPanel HorizontalAlignment="Right" Margin="0,100,20,0" ></locals:BookmarksPanel>
 
-    <Grid x:Name="grdCatalog"  Margin="20" Opacity=".7" Background="AliceBlue" Drop="Grid_Drop">
-
+    <Grid x:Name="grdCatalog"  Margin="20" Opacity=".7" Background="AliceBlue" Drop="Grid_Drop" >
+      <Grid.CommandBindings>
+        <CommandBinding Command="Paste" Executed="CommandBinding_Executed">
+          
+        </CommandBinding>
+      </Grid.CommandBindings>
+      
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition/>
@@ -187,7 +215,7 @@
                  ItemTemplate="{StaticResource listItemTemplate}"  Background="Transparent" ItemsSource="{Binding}"                                  
                
                
-               d:DataContext="{d:DesignData Source=SampleData.xaml}"
+               d:DataContext="{d:DesignData Source=SampleData.xaml}" 
                
                  >
 
@@ -205,7 +233,11 @@
     </Grid>
 
     <Grid Height="Auto" Margin="10" VerticalAlignment="Top" Width="400"  HorizontalAlignment="Right"  >
+      <Grid.CommandBindings>
+        <CommandBinding Command="Paste" Executed="CommandBinding_Executed">
 
+        </CommandBinding>
+      </Grid.CommandBindings>
       <Grid.ColumnDefinitions>
         <ColumnDefinition/>
         <ColumnDefinition Width="Auto"/>
